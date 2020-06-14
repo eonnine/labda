@@ -1,5 +1,6 @@
 // ref: https://plugins.jenkins.io/kubernetes/
 podTemplate(containers: [
+    containerTemplate(name: 'node', image:'node:10.20.1', command: 'cat', ttyEnabled: true),
     containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
     containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.8.8', command: 'cat', ttyEnabled: true),
 ],
@@ -7,12 +8,17 @@ volumes: [
   hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
 ]) {
     node(POD_LABEL) {
-        def env = "dev"
-        def repo = "jeg910716/watcha-webapp:${env}"
+        def image = "jeg910716/labda-${BUILD_NUMBER}"
 
         stage('Checkout github branch') {
-            // Get some code from a Git repository
             checkout scm
+        }
+
+        stage('Run test') {
+            container('node') {
+                sh "npm install"
+                sh "npm run test"
+            }
         }
 
         stage('Build and Push docker image') {
@@ -25,8 +31,8 @@ volumes: [
                 ]])  {
                     sh """
                         docker login -u ${DOCKER_HUB_USER} -p ${DOCKER_HUB_PASSWORD}
-                        docker build -t ${repo} .
-                        docker push ${repo}
+                        docker build -t ${image} .
+                        docker push ${image}
                     """
                 }
             }
@@ -34,7 +40,15 @@ volumes: [
         stage('Apply kubernetes') {
             container('kubectl') {
                 sh """
-                    kubectl apply -f ./config/k8s/${env}.yaml --validate=false
+                    kubectl set image deployment/labda labda=${image}
+                """
+            }
+        }
+        stage('Apply kubernetes') {
+            container('kubectl') {
+                sh """
+                kubectl set image deployment/me me=${image}
+                    kubectl apply -f ./config/k8s/dev.yaml
                 """
             }
         }

@@ -1,12 +1,12 @@
 {
-  "name": "watcha-webapp",
+  "name": "labda",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "start": "set PORT=3010 && react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-scripts test --watchAll=false",
-    "prettier": "prettier --config prettierrc.js --write src/**/*.{js,jsx,ts,tsx,json,css,scss,md}",
+    "prettier": "prettier --config prettierrc.js --write src/**/*.{js,jsx,ts,tsx}",
     "lint": "eslint . --ext .js,.ts,.tsx",
     "generate": "graphql-codegen"
   },
@@ -61,7 +61,7 @@
     "pre-commit": "lint-staged"
   },
   "lint-staged": {
-    "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+    "src/**/*.{js,jsx,ts,tsx}": [
       "npm run lint",
       "npm run prettier",
       "git add"
