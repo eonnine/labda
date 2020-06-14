@@ -57,7 +57,7 @@
     [ ] Like  
     [ ] Star rating  
     [ ] Comment  
-    [ ] Content data
+    [ ] Content data  
     ~~[ ] Recommend~~  
 
   + My Page  
